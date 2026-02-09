@@ -4,7 +4,7 @@ Training
 
 
 def train(server, nb_training_steps, honest_clients, byz_client):
-    accuracy_history = []
+    accuracy_history = []  # {"test":[], "validation":[]}
 
     for training_step in range(nb_training_steps + 1):
         # Send (Updated) Server Model to Clients

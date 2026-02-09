@@ -1,7 +1,7 @@
 import torch
 
 # Random seed for reproducibility
-SEED = 42
+SEED = None  # 42
 
 # Device configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
@@ -10,8 +10,8 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 SIMULATION_CONFIG = {
     "num_honest": 8,  # Number of honest clients
     "num_byzantine": 2,  # Number of Byzantine clients
-    "rounds": 20,  # Number of communication rounds
-    "batch_size": 32,
+    "rounds": 30,  # Number of communication rounds
+    "batch_size": 64,
     "device": DEVICE,
     "dataset_name": "MNIST",  # Options: MNIST, CIFAR10, FashionMNIST
 }
@@ -19,28 +19,28 @@ SIMULATION_CONFIG = {
 # Model parameters
 MODEL_CONFIG = {
     "model_name": "cnn_mnist",  # Options: cnn_mnist, mlp_mnist, resnet18_cifar
-    "loss_name": "NLLLoss",  # Options: NLLLoss, CrossEntropyLoss
+    "loss_name": "CrossEntropyLoss",  # Options: NLLLoss, CrossEntropyLoss
     "optimizer_name": "SGD",  # Options: SGD, Adam
-    "learning_rate": 0.1,
+    "learning_rate": 0.01,
     "momentum": 0.9,
     "weight_decay": 0.0001,
 }
 
 # Data distribution parameters
 DATA_DISTRIBUTION_CONFIG = {
-    "distribution_name": "dirichlet_niid",  # Options: iid, dirichlet_niid, pathological_niid
+    "distribution_name": "iid",  # Options: iid, dirichlet_niid, pathological_niid
     "distribution_parameter": 0.5,  # For Dirichlet: concentration parameter
     "store_per_client_metrics": True,  # Whether to store metrics per client
 }
 
 # Server parameters
 SERVER_CONFIG = {
-    "optimizer_name": "SGD",
-    "learning_rate": 0.1,
-    "weight_decay": 0.0001,
+    "optimizer_name": MODEL_CONFIG["optimizer_name"],
+    "learning_rate": MODEL_CONFIG["learning_rate"],
+    "weight_decay": MODEL_CONFIG["weight_decay"],
     "milestones": [1000],  # Learning rate decay milestones
     "learning_rate_decay": 0.25,
-    "use_pre_aggregation": True,  # Whether to use pre-aggregation defenses
+    "use_pre_aggregation": False,  # Whether to use pre-aggregation defenses
 }
 
 # Client parameters
@@ -53,17 +53,26 @@ CLIENT_CONFIG = {
 
 # Attack parameters
 ATTACK_CONFIG = {
-    "attack_name": "InnerProductManipulation",  # Options: SignFlip, Noise, InnerProductManipulation
+    "attack_name": "SignFlipping",
+    # Options: SignFlipping, Noise, InnerProductManipulation, Optimal_InnerProductManipulation
     "attack_parameters": {
         "tau": 3.0,  # For InnerProductManipulation
-        "scale": 5.0,  # For SignFlip
+        "scale": 10.0,  # For SignFlip
         "noise_std": 0.1,  # For Noise attack
     },
+    "use_pre_aggregation": False,
 }
 
 # Aggregator parameters
 AGGREGATOR_CONFIG = {
-    "aggregators_to_compare": ["Average", "TrMean", "Median", "Krum", "MultiKrum", "MDA"],
+    "aggregators_to_compare": [
+        "Average",
+        "TrMean",
+        "Median",
+        "Krum",
+        "MultiKrum",
+        "MDA",
+    ],
     "single_aggregator": "TrMean",
     "pre_aggregation_defenses": [
         {"name": "Clipping", "parameters": {"c": 2.0}},
@@ -73,8 +82,8 @@ AGGREGATOR_CONFIG = {
 
 # Output/Result parameters
 OUTPUT_CONFIG = {
-    "plot_save_path": "results/fl_comparison.png",
-    "results_save_path": "results/simulation_results.json",
+    "plot_save_path": f"results/fl_comparison_{ATTACK_CONFIG['attack_name']}.png",
+    "results_save_path": f"results/simulation_results_{ATTACK_CONFIG['attack_name']}.json",
     "verbose": True,
     "save_models": False,
 }
@@ -88,8 +97,10 @@ def print_config():
     print(f"Device: {DEVICE}")
     print(f"Seed: {SEED}")
     print(f"Model: {MODEL_CONFIG['model_name']}")
-    print(f"Clients: {SIMULATION_CONFIG['num_honest']} honest, "
-          f"{SIMULATION_CONFIG['num_byzantine']} Byzantine")
+    print(
+        f"Clients: {SIMULATION_CONFIG['num_honest']} honest, "
+        f"{SIMULATION_CONFIG['num_byzantine']} Byzantine"
+    )
     print(f"Rounds: {SIMULATION_CONFIG['rounds']}")
     print(f"Data Distribution: {DATA_DISTRIBUTION_CONFIG['distribution_name']}")
     print(f"Attack: {ATTACK_CONFIG['attack_name']}")

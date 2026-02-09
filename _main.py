@@ -34,20 +34,22 @@ def main():
     )
 
     # Run single aggregator simulation
-    print(f"\nRunning simulation with aggregator: {config.AGGREGATOR_CONFIG['single_aggregator']}")
-    accuracy_history = sim.run_single_aggregator()
-    
+    # print(f"\nRunning simulation with aggregator: {config.AGGREGATOR_CONFIG['single_aggregator']}")
+    # accuracy_history = sim.run_single_aggregator()
+
     # Compare multiple aggregators
-    print(f"\nComparing aggregators: {config.AGGREGATOR_CONFIG['aggregators_to_compare']}")
+    print(
+        f"\nComparing aggregators: {config.AGGREGATOR_CONFIG['aggregators_to_compare']}"
+    )
     sim.compare_aggregators()
-    
+
     # Plot results
     sim.plot_results(save_path=config.OUTPUT_CONFIG["plot_save_path"])
-    
+
     # Save results
     sim.save_results(save_path=config.OUTPUT_CONFIG["results_save_path"])
-    
-    return accuracy_history
+
+    return
 
 
 if __name__ == "__main__":
