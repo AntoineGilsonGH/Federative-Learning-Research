@@ -289,6 +289,7 @@ class ByzFLSimulation:
         if not self.results:
             raise ValueError("No results to plot. Run simulation first.")
 
+        # Default: plot all available aggregators
         if aggregator_names is None:
             aggregator_names = list(self.results.keys())
 
@@ -297,26 +298,41 @@ class ByzFLSimulation:
         colors = ["red", "green", "blue", "orange", "purple", "brown"]
         linestyles = ["-", "--", "-.", ":", "-", "--"]
 
+        x_step = 10  # distance between evaluation points
+
         for idx, name in enumerate(aggregator_names):
-            if name in self.results:
-                plt.plot(
-                    [i * 10 for i in range(len(self.results[name]))],
-                    self.results[name],
-                    label=name,
-                    color=colors[idx % len(colors)],
-                    linestyle=linestyles[idx % len(linestyles)],
-                    linewidth=2,
-                )
+            if name not in self.results:
+                continue
+
+            y_values = self.results[name]
+            x_values = [i * x_step for i in range(len(y_values))]
+
+            plt.plot(
+                x_values,
+                y_values,
+                label=name,
+                color=colors[idx % len(colors)],
+                linestyle=linestyles[idx % len(linestyles)],
+                linewidth=2,
+            )
 
         if title is None:
             title = f"ByzFL: {self.num_byzantine_clients}/{self.total_clients} Byzantine Clients"
 
+        # ----- Axis formatting -----
         plt.title(title)
         plt.xlabel("Training Steps")
         plt.ylabel("Test Accuracy")
+
+        # Force plot to start at 0 and end at last point
+        if aggregator_names:
+            first_name = aggregator_names[0]
+            n_points = len(self.results[first_name])
+            plt.xlim(0, (n_points - 1) * x_step)
+
+        plt.ylim(0, 1.0)
         plt.grid(True, alpha=0.3)
         plt.legend()
-        plt.ylim(0, 1.0)
 
         if save_path:
             os.makedirs(os.path.dirname(save_path), exist_ok=True)

@@ -2,21 +2,18 @@
 Training
 """
 
-from tqdm import tqdm
-
 
 def train(server, nb_training_steps, honest_clients, byz_client):
     accuracy_history = []  # {"test":[], "validation":[]}
 
-    for training_step in tqdm(range(nb_training_steps), desc="Training"):
+    for training_step in range(nb_training_steps):
 
-        # Evaluate Global Model Every 100 Training Steps
+        # Evaluate Global Model Every 10 Training Steps
         if training_step % 10 == 0:
             test_acc = server.compute_test_accuracy()
             accuracy_history.append(test_acc)
-            # print(f"--- Training Step {training_step}/{nb_training_steps} ---")
-            # print(f"Test Accuracy: {test_acc:.4f}")
-
+            print(f"--- Training Step {training_step}/{nb_training_steps} ---")
+            print(f"Test Accuracy: {test_acc:.4f}")
         # Honest Clients Compute Gradients
         for client in honest_clients:
             client.compute_gradients()
@@ -39,5 +36,10 @@ def train(server, nb_training_steps, honest_clients, byz_client):
         new_model = server.get_dict_parameters()
         for client in honest_clients:
             client.set_model_state(new_model)
+
+    test_acc = server.compute_test_accuracy()
+    accuracy_history.append(test_acc)
+    print(f"--- Training Step {training_step}/{nb_training_steps} ---")
+    print(f"Test Accuracy: {test_acc:.4f}")
 
     return accuracy_history

@@ -9,7 +9,7 @@ DEVICE = "cuda"
 
 # Simulation parameters
 SIMULATION_CONFIG = {
-    "num_honest": 4,  # Number of honest clients
+    "num_honest": 3,  # Number of honest clients
     "num_byzantine": 1,  # Number of Byzantine clients
     "rounds": 200,  # Number of communication rounds
     "batch_size": 64,
@@ -59,10 +59,9 @@ ATTACK_CONFIG = {
     # Options: SignFlipping, Noise, InnerProductManipulation, Optimal_InnerProductManipulation
     "attack_parameters": {
         "tau": 3.0,  # For InnerProductManipulation
-        "scale": 10.0,  # For SignFlip
-        "noise_std": 0.1,  # For Noise attack
+        # "scale": 10.0,  # For SignFlip
+        # "noise_std": 0.1,  # For Noise attack
     },
-    "use_pre_aggregation": False,
 }
 
 # Aggregator parameters
@@ -85,8 +84,8 @@ AGGREGATOR_CONFIG = {
 # Output/Result parameters
 results_suffix = f"_{ATTACK_CONFIG['attack_name']}_{MODEL_CONFIG["optimizer_name"]}"
 OUTPUT_CONFIG = {
-    "plot_save_path": f"results/fl_comparison{results_suffix}.png",
-    "results_save_path": f"results/simulation_results{results_suffix}.json",
+    "plot_save_path": f"results/fl_comparison{results_suffix}_{SIMULATION_CONFIG['num_byzantine']}_{SIMULATION_CONFIG['num_honest']}.png",
+    "results_save_path": f"results/simulation_results{results_suffix}_{SIMULATION_CONFIG['num_byzantine']}_{SIMULATION_CONFIG['num_honest']}.json",
     "verbose": True,
     "save_models": False,
 }

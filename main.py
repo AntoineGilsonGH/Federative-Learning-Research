@@ -47,7 +47,7 @@ def main():
     sim.plot_results(save_path=config.OUTPUT_CONFIG["plot_save_path"])
 
     # Save results
-    sim.save_results(save_path=config.OUTPUT_CONFIG["results_save_path"])
+    # sim.save_results(save_path=config.OUTPUT_CONFIG["results_save_path"])
 
     return
 

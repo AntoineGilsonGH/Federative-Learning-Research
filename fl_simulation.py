@@ -82,11 +82,11 @@ server = Server(
         "weight_decay": 0.0001,
         "milestones": [1000],
         "learning_rate_decay": 0.25,
-        "aggregator_info": {"name": "TrMean", "parameters": {"f": nb_byz_clients}},
-        "pre_agg_list": [
-            {"name": "Clipping", "parameters": {"c": 2.0}},
-            {"name": "NNM", "parameters": {"f": nb_byz_clients}},
-        ],
+        "aggregator_info": {"name": "Average", "parameters": {"f": nb_byz_clients}},
+        "pre_agg_list": [],
+        #     {"name": "Clipping", "parameters": {"c": 2.0}},
+        #     {"name": "NNM", "parameters": {"f": nb_byz_clients}},
+        # ],
     }
 )
 
