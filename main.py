@@ -1,75 +1,55 @@
 import torch
+import numpy as np
+from byzfl.utils.misc import set_random_seed
 
-import config
-from utils.simulation import Simulation
-from utils.load_models import get_model_class_and_args
-
-
-# Define custom attack function
-def custom_attack(grads, client_idx, scale=None, noise=None):
-    """Custom Byzantine attack."""
-    if scale is None:
-        scale = config.ATTACK_CONFIG["attack_scale"]
-    if noise is None:
-        noise = config.ATTACK_CONFIG["attack_noise"]
-
-    if client_idx < config.SIMULATION_CONFIG["num_byzantine"]:
-        # Scale and add noise
-        grads = -scale * grads
-        grads += torch.randn_like(grads) * noise
-    return grads
+import _config as config
+from _simulation_byzfl import ByzFLSimulation
 
 
 def main():
+    """Main entry point using ByzFL framework."""
+    # Set random seed for reproducibility
+    if config.SEED is not None:
+        set_random_seed(config.SEED)
+        torch.manual_seed(config.SEED)
+        np.random.seed(config.SEED)
+
+    # Print configuration
     config.print_config()
 
-    # Get model class and arguments
-    model_class, model_args = get_model_class_and_args()
-
     # Create simulation
-    sim = Simulation(
-        model_class=model_class,
-        model_args=model_args,
-        **config.SIMULATION_CONFIG,
+    sim = ByzFLSimulation(
+        dataset_name=config.SIMULATION_CONFIG["dataset_name"],
+        num_honest_clients=config.SIMULATION_CONFIG["num_honest"],
+        num_byzantine_clients=config.SIMULATION_CONFIG["num_byzantine"],
+        num_rounds=config.SIMULATION_CONFIG["rounds"],
+        batch_size=config.SIMULATION_CONFIG["batch_size"],
+        device=config.SIMULATION_CONFIG["device"],
+        model_config=config.MODEL_CONFIG,
+        aggregator_config=config.AGGREGATOR_CONFIG,
+        attack_config=config.ATTACK_CONFIG,
+        data_distribution_config=config.DATA_DISTRIBUTION_CONFIG,
+        server_config=config.SERVER_CONFIG,
+        client_config=config.CLIENT_CONFIG,
     )
 
-    # Determine attack function
-    attack_fn = (
-        custom_attack if config.ATTACK_CONFIG["attack_fn"] == "custom_attack" else None
-    )
-    attack_args = {
-        "scale": config.ATTACK_CONFIG["attack_scale"],
-        "noise": config.ATTACK_CONFIG["attack_noise"],
-    }
-
-    # Run single aggregator
-    if config.OUTPUT_CONFIG["verbose"]:
-        print(f"\nRunning {config.AGGREGATOR_CONFIG['single_aggregator']} aggregator...")
-
-    acc_tm = sim.run(
-        config.AGGREGATOR_CONFIG["single_aggregator"],
-        attack_fn=attack_fn,
-        attack_args=attack_args,
-    )
+    # Run single aggregator simulation
+    # print(f"\nRunning simulation with aggregator: {config.AGGREGATOR_CONFIG['single_aggregator']}")
+    # accuracy_history = sim.run_single_aggregator()
 
     # Compare multiple aggregators
-    if config.OUTPUT_CONFIG["verbose"]:
-        print(f"\nComparing multiple aggregators: {config.AGGREGATOR_CONFIG['aggregators_to_compare']}")
-
-    sim.compare_aggregators(
-        aggregator_names=config.AGGREGATOR_CONFIG["aggregators_to_compare"],
-        attack_fn=attack_fn,
-        attack_args=attack_args,
+    print(
+        f"\nComparing aggregators: {config.AGGREGATOR_CONFIG['aggregators_to_compare']}"
     )
+    sim.compare_aggregators()
 
-    # Save plot
-    plot_path = config.OUTPUT_CONFIG["plot_save_path"]
-    sim.plot_results(save_path=plot_path)
-    print(f"\nPlot saved to: {plot_path}")
+    # Plot results
+    sim.plot_results(save_path=config.OUTPUT_CONFIG["plot_save_path"])
 
-    sim.save_results(save_path=config.OUTPUT_CONFIG.get("results_save_path"), acc_tm=acc_tm)
+    # Save results
+    sim.save_results(save_path=config.OUTPUT_CONFIG["results_save_path"])
 
-    return acc_tm
+    return
 
 
 if __name__ == "__main__":
