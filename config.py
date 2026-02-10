@@ -20,7 +20,7 @@ SIMULATION_CONFIG = {
 MODEL_CONFIG = {
     "model_name": "cnn_mnist",  # Options: cnn_mnist, mlp_mnist, resnet18_cifar
     "loss_name": "CrossEntropyLoss",  # Options: NLLLoss, CrossEntropyLoss
-    "optimizer_name": "SGD",  # Options: SGD, Adam
+    "optimizer_name": "Adam",  # Options: SGD, Adam
     "learning_rate": 0.01,
     "momentum": 0.9,
     "weight_decay": 0.0001,
@@ -53,7 +53,7 @@ CLIENT_CONFIG = {
 
 # Attack parameters
 ATTACK_CONFIG = {
-    "attack_name": "SignFlipping",
+    "attack_name": "InnerProductManipulation",
     # Options: SignFlipping, Noise, InnerProductManipulation, Optimal_InnerProductManipulation
     "attack_parameters": {
         "tau": 3.0,  # For InnerProductManipulation
@@ -81,9 +81,10 @@ AGGREGATOR_CONFIG = {
 }
 
 # Output/Result parameters
+results_suffix = f"_{ATTACK_CONFIG['attack_name']}_{MODEL_CONFIG["optimizer_name"]}"
 OUTPUT_CONFIG = {
-    "plot_save_path": f"results/fl_comparison_{ATTACK_CONFIG['attack_name']}.png",
-    "results_save_path": f"results/simulation_results_{ATTACK_CONFIG['attack_name']}.json",
+    "plot_save_path": f"results/fl_comparison{results_suffix}.png",
+    "results_save_path": f"results/simulation_results{results_suffix}.json",
     "verbose": True,
     "save_models": False,
 }
