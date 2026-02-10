@@ -2,8 +2,8 @@ import torch
 import numpy as np
 from byzfl.utils.misc import set_random_seed
 
-import _config as config
-from _simulation_byzfl import ByzFLSimulation
+import config
+from simulation_byzfl import ByzFLSimulation
 
 
 def main():
