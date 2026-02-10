@@ -300,7 +300,7 @@ class ByzFLSimulation:
         for idx, name in enumerate(aggregator_names):
             if name in self.results:
                 plt.plot(
-                    range(1, len(self.results[name]) + 1),
+                    [i * 10 for i in range(len(self.results[name]))],
                     self.results[name],
                     label=name,
                     color=colors[idx % len(colors)],
@@ -312,7 +312,7 @@ class ByzFLSimulation:
             title = f"ByzFL: {self.num_byzantine_clients}/{self.total_clients} Byzantine Clients"
 
         plt.title(title)
-        plt.xlabel("Communication Rounds")
+        plt.xlabel("Training Steps")
         plt.ylabel("Test Accuracy")
         plt.grid(True, alpha=0.3)
         plt.legend()

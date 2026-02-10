@@ -5,12 +5,13 @@ SEED = None  # 42
 
 # Device configuration
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda"
 
 # Simulation parameters
 SIMULATION_CONFIG = {
-    "num_honest": 8,  # Number of honest clients
-    "num_byzantine": 2,  # Number of Byzantine clients
-    "rounds": 30,  # Number of communication rounds
+    "num_honest": 4,  # Number of honest clients
+    "num_byzantine": 1,  # Number of Byzantine clients
+    "rounds": 200,  # Number of communication rounds
     "batch_size": 64,
     "device": DEVICE,
     "dataset_name": "MNIST",  # Options: MNIST, CIFAR10, FashionMNIST
@@ -20,10 +21,11 @@ SIMULATION_CONFIG = {
 MODEL_CONFIG = {
     "model_name": "cnn_mnist",  # Options: cnn_mnist, mlp_mnist, resnet18_cifar
     "loss_name": "CrossEntropyLoss",  # Options: NLLLoss, CrossEntropyLoss
-    "optimizer_name": "Adam",  # Options: SGD, Adam
-    "learning_rate": 0.01,
+    "optimizer_name": "SGD",  # Options: SGD, Adam
+    "learning_rate": 0.1,
     "momentum": 0.9,
     "weight_decay": 0.0001,
+    "learning_rate_decay": 0.25,
 }
 
 # Data distribution parameters
@@ -70,8 +72,8 @@ AGGREGATOR_CONFIG = {
         "TrMean",
         "Median",
         "Krum",
-        "MultiKrum",
-        "MDA",
+        # "MultiKrum",
+        # "MDA",
     ],
     "single_aggregator": "TrMean",
     "pre_aggregation_defenses": [
