@@ -4,8 +4,16 @@ import torch
 SEED = None  # 42
 
 # Device configuration
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-DEVICE = "cuda"
+def get_device():
+    if torch.cuda.is_available():
+        return "cuda"
+    # GPU Apple (Metal)
+    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+DEVICE = get_device()
+
 
 # Simulation parameters
 SIMULATION_CONFIG = {
@@ -57,7 +65,7 @@ CLIENT_CONFIG = {
 ATTACK_CONFIG = {
     "attacks_to_compare": [
         {"attack_name": "SignFlipping", "attack_parameters": {"scale": 10.0}},
-        {"attack_name": "Noise", "attack_parameters": {"noise_std": 0.1}},
+        {"attack_name": "Gaussian", "attack_parameters": {"sigma": 0.1}},
         {"attack_name": "InnerProductManipulation", "attack_parameters": {"tau": 3.0}},
     ]
 }
