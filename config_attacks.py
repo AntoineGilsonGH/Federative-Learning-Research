@@ -9,8 +9,8 @@ DEVICE = "cuda"
 
 # Simulation parameters
 SIMULATION_CONFIG = {
-    "num_honest": 8,  # Number of honest clients
-    "num_byzantine": 2,  # Number of Byzantine clients
+    "num_honest": 2,  # Number of honest clients
+    "num_byzantine": 1,  # Number of Byzantine clients
     "rounds": 200,  # Number of communication rounds
     "batch_size": 64,
     "device": DEVICE,
@@ -30,8 +30,8 @@ MODEL_CONFIG = {
 
 # Data distribution parameters
 DATA_DISTRIBUTION_CONFIG = {
-    "distribution_name": "dirichlet_niid",  # Options: iid, dirichlet_niid, pathological_niid
-    "distribution_parameter": 0.2,  # For Dirichlet: concentration parameter
+    "distribution_name": "iid",  # Options: iid, dirichlet_niid, pathological_niid
+    "distribution_parameter": 0.5,  # For Dirichlet: concentration parameter
     "store_per_client_metrics": True,  # Whether to store metrics per client
 }
 
@@ -60,14 +60,17 @@ ATTACK_CONFIG = {
         {"attack_name": "SignFlipping", "attack_parameters": {"scale": 10.0}},
         {"attack_name": "Gaussian", "attack_parameters": {"sigma": 0.1}},
         {"attack_name": "InnerProductManipulation", "attack_parameters": {"tau": 3.0}},
-        {"attack_name": "Optimal_InnerProductManipulation", "attack_parameters": {"tau": 3.0}},
+        # {
+        #     "attack_name": "Optimal_InnerProductManipulation",
+        #     "attack_parameters": {"tau": 3.0},
+        # },
     ]
 }
 
 # Aggregator parameters
 AGGREGATOR_CONFIG = {
-    "single_aggregator": "Average", # "TrMean", "Median", "Krum", # "MultiKrum", # "MDA", "Average"
-    "use_pre_aggregation": False,   # option
+    "single_aggregator": "Average",  # "TrMean", "Median", "Krum", # "MultiKrum", # "MDA", "Average"
+    "use_pre_aggregation": False,  # option
     "pre_aggregation_defenses": [
         {"name": "Clipping", "parameters": {"c": 2.0}},
         {"name": "NNM", "parameters": {"f": SIMULATION_CONFIG["num_byzantine"]}},

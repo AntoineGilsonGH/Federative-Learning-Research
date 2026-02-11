@@ -219,21 +219,20 @@ class ByzFLSimulation_attacks:
             attack_params = attack.get("attack_parameters", {})
 
         attack_config = {
-        "name": attack_name,
-        "f": self.num_byzantine_clients,
-        "parameters": attack_params,
+            "name": attack_name,
+            "f": self.num_byzantine_clients,
+            "parameters": attack_params,
         }
 
         return ByzantineClient(attack_config)
 
     def run_single_aggregator(
-    self,
-    aggregator_name: str = None,
-    attack: Dict[str, Any] = None,
-    result_key: str = None,
-    save_results: bool = True,
-     ) -> List[float]:
-
+        self,
+        aggregator_name: str = None,
+        attack: Dict[str, Any] = None,
+        result_key: str = None,
+        save_results: bool = True,
+    ) -> List[float]:
         """
         Run simulation with a single aggregator.
 
@@ -252,6 +251,8 @@ class ByzFLSimulation_attacks:
         print(f"Byzantine clients: {self.num_byzantine_clients}")
 
         # Setup server and Byzantine client
+        self._setup_clients()
+        self._prepare_data()
         server = self._setup_server(aggregator_name)
         byz_client = self._setup_byzantine_client(attack)
 
@@ -264,7 +265,6 @@ class ByzFLSimulation_attacks:
         if save_results:
             key = result_key or aggregator_name
             self.results[key] = accuracy_history
-        
 
         # Print final results
         print(f"\nFinal Accuracy: {accuracy_history[-1]:.2%}")
@@ -305,7 +305,9 @@ class ByzFLSimulation_attacks:
         """
         Compare multiple attacks while keeping the aggregator fixed.
         """
-        print(f"\n--- Comparing {len(attacks)} attacks with aggregator={aggregator_name} ---")
+        print(
+            f"\n--- Comparing {len(attacks)} attacks with aggregator={aggregator_name} ---"
+        )
 
         for atk in attacks:
             atk_name = atk.get("attack_name", "UnknownAttack")
@@ -314,15 +316,14 @@ class ByzFLSimulation_attacks:
 
             print(f"\nRunning attack: {key}")
             self.run_single_aggregator(
-            aggregator_name=aggregator_name,
-            attack=atk,
-            result_key=key,
-            save_results=True,
-        )
+                aggregator_name=aggregator_name,
+                attack=atk,
+                result_key=key,
+                save_results=True,
+            )
 
         if save_plots:
             self.plot_results()
-
 
     def plot_results(
         self,

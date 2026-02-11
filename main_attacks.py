@@ -39,11 +39,10 @@ def main():
 
     print(f"\nComparing attacks: {config.ATTACK_CONFIG['attacks_to_compare']}")
     sim.compare_attacks(
-    attacks=config.ATTACK_CONFIG["attacks_to_compare"],
-    aggregator_name=config.AGGREGATOR_CONFIG["single_aggregator"],
-)
+        attacks=config.ATTACK_CONFIG["attacks_to_compare"],
+        aggregator_name=config.AGGREGATOR_CONFIG["single_aggregator"],
+    )
     sim.plot_results(save_path=config.OUTPUT_CONFIG["plot_save_path"])
-
 
     # Save results
     #  sim.save_results(save_path=config.OUTPUT_CONFIG["results_save_path"])

@@ -1,7 +1,9 @@
 """
 Training
 """
+
 import torch
+
 
 def train_attacks(server, nb_training_steps, honest_clients, byz_client):
     accuracy_history = []  # {"test":[], "validation":[]}
@@ -43,7 +45,6 @@ def train_attacks(server, nb_training_steps, honest_clients, byz_client):
 
         gradients = honest_gradients + fixed_byz
 
-
         # Update Global Model
         server.update_model_with_gradients(gradients)
 
@@ -54,7 +55,7 @@ def train_attacks(server, nb_training_steps, honest_clients, byz_client):
 
     test_acc = server.compute_test_accuracy()
     accuracy_history.append(test_acc)
-    print(f"--- Training Step {training_step}/{nb_training_steps} ---")
+    print(f"--- Training Step {nb_training_steps}/{nb_training_steps} ---")
     print(f"Test Accuracy: {test_acc:.4f}")
 
     return accuracy_history

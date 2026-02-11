@@ -39,7 +39,7 @@ def train(server, nb_training_steps, honest_clients, byz_client):
 
     test_acc = server.compute_test_accuracy()
     accuracy_history.append(test_acc)
-    print(f"--- Training Step {training_step}/{nb_training_steps} ---")
+    print(f"--- Training Step {nb_training_steps}/{nb_training_steps} ---")
     print(f"Test Accuracy: {test_acc:.4f}")
 
     return accuracy_history

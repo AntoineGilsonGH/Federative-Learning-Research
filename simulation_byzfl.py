@@ -237,6 +237,8 @@ class ByzFLSimulation:
         print(f"Byzantine clients: {self.num_byzantine_clients}")
 
         # Setup server and Byzantine client
+        self._setup_clients()
+        self._prepare_data()
         server = self._setup_server(aggregator_name)
         byz_client = self._setup_byzantine_client()
 
