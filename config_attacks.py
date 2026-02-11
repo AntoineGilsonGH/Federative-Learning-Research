@@ -4,21 +4,13 @@ import torch
 SEED = None  # 42
 
 # Device configuration
-def get_device():
-    if torch.cuda.is_available():
-        return "cuda"
-    # GPU Apple (Metal)
-    if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
-        return "mps"
-    return "cpu"
-
-DEVICE = get_device()
-
+DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cuda"
 
 # Simulation parameters
 SIMULATION_CONFIG = {
-    "num_honest": 3,  # Number of honest clients
-    "num_byzantine": 1,  # Number of Byzantine clients
+    "num_honest": 8,  # Number of honest clients
+    "num_byzantine": 2,  # Number of Byzantine clients
     "rounds": 200,  # Number of communication rounds
     "batch_size": 64,
     "device": DEVICE,
@@ -38,8 +30,8 @@ MODEL_CONFIG = {
 
 # Data distribution parameters
 DATA_DISTRIBUTION_CONFIG = {
-    "distribution_name": "iid",  # Options: iid, dirichlet_niid, pathological_niid
-    "distribution_parameter": 0.5,  # For Dirichlet: concentration parameter
+    "distribution_name": "dirichlet_niid",  # Options: iid, dirichlet_niid, pathological_niid
+    "distribution_parameter": 0.2,  # For Dirichlet: concentration parameter
     "store_per_client_metrics": True,  # Whether to store metrics per client
 }
 
@@ -64,15 +56,17 @@ CLIENT_CONFIG = {
 # Attack parameters
 ATTACK_CONFIG = {
     "attacks_to_compare": [
+        {"attack_name": "ALittleIsEnough", "attack_parameters": {"tau": 1.5}},
         {"attack_name": "SignFlipping", "attack_parameters": {"scale": 10.0}},
         {"attack_name": "Gaussian", "attack_parameters": {"sigma": 0.1}},
         {"attack_name": "InnerProductManipulation", "attack_parameters": {"tau": 3.0}},
+        {"attack_name": "Optimal_InnerProductManipulation", "attack_parameters": {"tau": 3.0}},
     ]
 }
 
 # Aggregator parameters
 AGGREGATOR_CONFIG = {
-    "single_aggregator": "TrMean", # "Median", "Krum", # "MultiKrum", # "MDA", "Average"
+    "single_aggregator": "Average", # "TrMean", "Median", "Krum", # "MultiKrum", # "MDA", "Average"
     "use_pre_aggregation": False,   # option
     "pre_aggregation_defenses": [
         {"name": "Clipping", "parameters": {"c": 2.0}},
@@ -82,7 +76,7 @@ AGGREGATOR_CONFIG = {
 
 
 # Output/Result parameters
-results_suffix = f"_{AGGREGATOR_CONFIG['single_aggregator']}_{MODEL_CONFIG['optimizer_name']}"
+results_suffix = f"_{AGGREGATOR_CONFIG['single_aggregator']}_{MODEL_CONFIG['optimizer_name']}_{DATA_DISTRIBUTION_CONFIG['distribution_name']}_{DATA_DISTRIBUTION_CONFIG['distribution_parameter']}"
 OUTPUT_CONFIG = {
     "plot_save_path": f"results/attacks/fl_comparison{results_suffix}_{SIMULATION_CONFIG['num_byzantine']}_{SIMULATION_CONFIG['num_honest']}.png",
     "results_save_path": f"results/attacks/simulation_results{results_suffix}_{SIMULATION_CONFIG['num_byzantine']}_{SIMULATION_CONFIG['num_honest']}.json",

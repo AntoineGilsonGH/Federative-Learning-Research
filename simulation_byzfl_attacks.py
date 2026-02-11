@@ -7,7 +7,7 @@ import os
 from typing import List, Dict, Any
 import copy
 
-from utils.train import train
+from utils.train_attacks import train_attacks
 
 
 class ByzFLSimulation_attacks:
@@ -257,7 +257,7 @@ class ByzFLSimulation_attacks:
 
         # Run training
         print("Starting training...")
-        accuracy_history = train(
+        accuracy_history = train_attacks(
             server, self.num_rounds, self.honest_clients, byz_client
         )
 

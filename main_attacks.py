@@ -46,7 +46,7 @@ def main():
 
 
     # Save results
-    sim.save_results(save_path=config.OUTPUT_CONFIG["results_save_path"])
+    #  sim.save_results(save_path=config.OUTPUT_CONFIG["results_save_path"])
 
     return
 
