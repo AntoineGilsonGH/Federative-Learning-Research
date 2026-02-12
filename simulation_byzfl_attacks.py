@@ -7,10 +7,10 @@ import os
 from typing import List, Dict, Any
 import copy
 
-from utils.train import train
+from utils.train_attacks import train_attacks
 
 
-class ByzFLSimulation:
+class ByzFLSimulation_attacks:
     """
     Federated Learning Simulation using ByzFL framework.
     """
@@ -206,18 +206,32 @@ class ByzFLSimulation:
 
         return Server(server_config)
 
-    def _setup_byzantine_client(self):
-        """Initialize Byzantine client with specified attack."""
+    def _setup_byzantine_client(self, attack: Dict[str, Any] = None):
+        """
+        Initialize Byzantine client with a specific attack.
+        If attack is None, fall back to self.attack_config (legacy behavior).
+        """
+        if attack is None:
+            attack_name = self.attack_config.get("attack_name", "SignFlipping")
+            attack_params = self.attack_config.get("attack_parameters", {})
+        else:
+            attack_name = attack.get("attack_name", "SignFlipping")
+            attack_params = attack.get("attack_parameters", {})
+
         attack_config = {
-            "name": self.attack_config.get("attack_name", "SignFlipping"),
+            "name": attack_name,
             "f": self.num_byzantine_clients,
-            "parameters": self.attack_config.get("attack_parameters", {}),
+            "parameters": attack_params,
         }
 
         return ByzantineClient(attack_config)
 
     def run_single_aggregator(
-        self, aggregator_name: str = None, save_results: bool = True
+        self,
+        aggregator_name: str = None,
+        attack: Dict[str, Any] = None,
+        result_key: str = None,
+        save_results: bool = True,
     ) -> List[float]:
         """
         Run simulation with a single aggregator.
@@ -240,16 +254,17 @@ class ByzFLSimulation:
         self._setup_clients()
         self._prepare_data()
         server = self._setup_server(aggregator_name)
-        byz_client = self._setup_byzantine_client()
+        byz_client = self._setup_byzantine_client(attack)
 
         # Run training
         print("Starting training...")
-        accuracy_history = train(
+        accuracy_history = train_attacks(
             server, self.num_rounds, self.honest_clients, byz_client
         )
 
         if save_results:
-            self.results[aggregator_name] = accuracy_history
+            key = result_key or aggregator_name
+            self.results[key] = accuracy_history
 
         # Print final results
         print(f"\nFinal Accuracy: {accuracy_history[-1]:.2%}")
@@ -277,6 +292,35 @@ class ByzFLSimulation:
         for agg_name in aggregator_names:
             print(f"\nRunning {agg_name}...")
             self.run_single_aggregator(agg_name, save_results=True)
+
+        if save_plots:
+            self.plot_results()
+
+    def compare_attacks(
+        self,
+        attacks: List[Dict[str, Any]],
+        aggregator_name: str = "TrMean",
+        save_plots: bool = True,
+    ):
+        """
+        Compare multiple attacks while keeping the aggregator fixed.
+        """
+        print(
+            f"\n--- Comparing {len(attacks)} attacks with aggregator={aggregator_name} ---"
+        )
+
+        for atk in attacks:
+            atk_name = atk.get("attack_name", "UnknownAttack")
+            atk_params = atk.get("attack_parameters", {})
+            key = f"{atk_name} {atk_params}"
+
+            print(f"\nRunning attack: {key}")
+            self.run_single_aggregator(
+                aggregator_name=aggregator_name,
+                attack=atk,
+                result_key=key,
+                save_results=True,
+            )
 
         if save_plots:
             self.plot_results()

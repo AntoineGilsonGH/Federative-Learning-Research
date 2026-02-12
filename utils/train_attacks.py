@@ -2,8 +2,10 @@
 Training
 """
 
+import torch
 
-def train(server, nb_training_steps, honest_clients, byz_client):
+
+def train_attacks(server, nb_training_steps, honest_clients, byz_client):
     accuracy_history = []  # {"test":[], "validation":[]}
 
     for training_step in range(nb_training_steps):
@@ -24,10 +26,24 @@ def train(server, nb_training_steps, honest_clients, byz_client):
         ]
 
         # Apply Byzantine Attack
-        byz_vector = byz_client.apply_attack(honest_gradients)
+        byz_updates = byz_client.apply_attack(honest_gradients)
 
-        # Combine Honest and Byzantine Gradients
-        gradients = honest_gradients + byz_vector
+        # byz_updates peut être un tensor OU une liste de tensors
+        if not isinstance(byz_updates, list):
+            byz_updates = [byz_updates]
+
+        ref = honest_gradients[0]  # pour device + dtype de référence
+        fixed_byz = []
+        for u in byz_updates:
+            # si c'est du numpy, convertit en torch
+            if not torch.is_tensor(u):
+                u = torch.tensor(u)
+
+            # aligne device + dtype
+            u = u.to(device=ref.device, dtype=ref.dtype)
+            fixed_byz.append(u)
+
+        gradients = honest_gradients + fixed_byz
 
         # Update Global Model
         server.update_model_with_gradients(gradients)
